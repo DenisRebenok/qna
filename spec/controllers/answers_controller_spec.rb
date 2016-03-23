@@ -58,32 +58,32 @@ RSpec.describe AnswersController, type: :controller do
 
   describe "POST #create" do
     context "with valid atributes" do
-      before { @qna_params = { answer: attributes_for(:answer), question_id: question } }
+      let(:qna_params) { {answer: attributes_for(:answer), question_id: question} }
 
       it "assigns the requested answer to @answer" do
-        post :create, @qna_params
+        post :create, qna_params
         expect(assigns :answer).to eq(question.answers.first)
       end
 
       it 'saves the new answer in the database' do
-        expect { post :create, @qna_params }.to change(question.answers, :count).by(1)
+        expect { post :create, qna_params }.to change(question.answers, :count).by(1)
       end
 
       it "redirects to answer show view" do
-        post :create, @qna_params
+        post :create, qna_params
         expect(response).to redirect_to answer_path(assigns(:answer))
       end
     end
 
     context "with invalid attributes" do
-      before { @qna_params = { answer: attributes_for(:invalid_answer), question_id: question } }
+      let(:qna_params) { { answer: attributes_for(:invalid_answer), question_id: question } }
 
       it 'does not save the answer' do
-        expect { post :create, @qna_params }.to_not change(Answer, :count)
+        expect { post :create, qna_params }.to_not change(Answer, :count)
       end
 
       it "re-renders new view" do
-        post :create, @qna_params
+        post :create, qna_params
         expect(response).to render_template :new
       end
     end
