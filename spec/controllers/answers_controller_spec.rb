@@ -119,7 +119,7 @@ RSpec.describe AnswersController, type: :controller do
       end
 
       it "does not change answer attributes" do
-        expect(answer.body).to eq 'MyText'
+        expect(answer.body).to_not eq nil
       end
 
       it "re-render edit view" do
