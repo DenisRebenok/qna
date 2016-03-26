@@ -32,6 +32,7 @@ RSpec.describe AnswersController, type: :controller do
   end
 
   describe "GET #edit" do
+    sign_in_user
     let(:answer) { create :answer }
     before { get :edit, id: answer }
 
@@ -45,8 +46,10 @@ RSpec.describe AnswersController, type: :controller do
   end
 
   describe "POST #create" do
+    sign_in_user
+
     context "with valid atributes" do
-      let(:qna_params) { {answer: attributes_for(:answer), question_id: question} }
+      let(:qna_params) { {answer: attributes_for(:answer), question_id: question } }
 
       it "assigns the requested answer to @answer" do
         post :create, qna_params
@@ -55,6 +58,11 @@ RSpec.describe AnswersController, type: :controller do
 
       it 'saves the new answer in the database' do
         expect { post :create, qna_params }.to change(question.answers, :count).by(1)
+      end
+
+      it 'created answer belongs to user who have created it' do
+        post :create, qna_params
+        expect(assigns(:answer).user).to eq @user
       end
 
       it "redirects to question" do
@@ -78,6 +86,8 @@ RSpec.describe AnswersController, type: :controller do
   end
 
   describe "PATCH #update" do
+    sign_in_user
+
     let(:answer) { create :answer }
 
     it "assigns the requested answer to @answer" do
@@ -117,13 +127,14 @@ RSpec.describe AnswersController, type: :controller do
   end
 
   describe "DELETE #destroy" do
+    sign_in_user
+
     let!(:answer) { create :answer }
 
     it "assigns the requested answer to @answer" do
       delete :destroy, id: answer
       expect(assigns(:answer)).to eq(answer)
     end
-
 
     it "deletes answer" do
       expect { delete :destroy, id: answer }.to change(Answer, :count).by(-1)
