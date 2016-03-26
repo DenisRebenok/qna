@@ -31,18 +31,6 @@ RSpec.describe AnswersController, type: :controller do
     end
   end
 
-  describe "GET #new" do
-    before { get :new, question_id: question }
-
-    it 'assigns a new Answer to @answer' do
-      expect(assigns :answer).to be_a_new(Answer)
-    end
-
-    it "renders new view" do
-      expect(response).to render_template :new
-    end
-  end
-
   describe "GET #edit" do
     let(:answer) { create :answer }
     before { get :edit, id: answer }
@@ -69,9 +57,9 @@ RSpec.describe AnswersController, type: :controller do
         expect { post :create, qna_params }.to change(question.answers, :count).by(1)
       end
 
-      it "redirects to answer show view" do
+      it "redirects to question" do
         post :create, qna_params
-        expect(response).to redirect_to answer_path(assigns(:answer))
+        expect(response).to redirect_to question_path(assigns(:answer).question)
       end
     end
 
@@ -82,9 +70,9 @@ RSpec.describe AnswersController, type: :controller do
         expect { post :create, qna_params }.to_not change(Answer, :count)
       end
 
-      it "re-renders new view" do
+      it "redirects to question" do
         post :create, qna_params
-        expect(response).to render_template :new
+        expect(response).to redirect_to question_path(assigns(:answer).question)
       end
     end
   end

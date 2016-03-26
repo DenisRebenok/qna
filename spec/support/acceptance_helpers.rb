@@ -13,4 +13,10 @@ module AcceptanceHelper
     fill_in 'Password confirmation', with: user.password_confirmation
     click_on 'Sign up'
   end
+
+  def create_answer(question, answer_body)
+    visit question_path(question)
+    fill_in 'Body', with: answer_body
+    click_on 'Post'
+  end
 end

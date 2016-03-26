@@ -1,4 +1,5 @@
 class AnswersController < ApplicationController
+  before_action :authenticate_user!, except: [:index, :show]
   before_action :load_question, only: [:index, :new, :create]
   before_action :load_answer, only: [:show, :edit, :update, :destroy]
 
@@ -9,20 +10,17 @@ class AnswersController < ApplicationController
   def show
   end
 
-  def new
-    @answer = @question.answers.new
-  end
+  # def new
+  #   @answer = @question.answers.new
+  # end
 
   def edit
   end
 
   def create
     @answer = @question.answers.new(answers_params)
-    if @answer.save
-      redirect_to @answer
-    else
-      render :new
-    end
+    msg = @answer.save ? 'Answer was successfully created.' : 'Error was happened when trying to save answer.'
+    redirect_to @question, notice: msg
   end
 
   def update

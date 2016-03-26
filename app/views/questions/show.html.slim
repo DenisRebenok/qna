@@ -2,3 +2,7 @@ h1.title= @question.title
 h3.body= @question.body
 - @answers.each do |answer|
     p= answer.body
+= form_for [@question, @answer] do |f|
+  = f.label :body
+  = f.text_area :body
+  = f.submit 'Post'
