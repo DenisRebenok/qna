@@ -124,15 +124,34 @@ RSpec.describe QuestionsController, type: :controller do
 
   describe "DELETE #destroy" do
     sign_in_user
-    before { question }
 
-    it "deletes question" do
-      expect { delete :destroy, id: question }.to change(Question, :count).by(-1)
+    context 'Author can delete his own question' do
+      let!(:question) { create(:question, user: @user) }
+
+      it 'User deletes his own question' do
+        expect { delete :destroy, id: question }.to change(Question, :count).by(-1)
+      end
+
+      it "redirects to index view and display notice message" do
+        delete :destroy, id: question
+        expect(response).to redirect_to questions_path
+        expect(flash[:notice]).to eq 'Your question successfully deleted.'
+      end
     end
 
-    it "redirects to index view" do
-      delete :destroy, id: question
-      expect(response).to redirect_to questions_path
+    context 'Non author can not delete question' do
+      let(:another_user) { create(:user) }
+      let!(:question) { create(:question, user: another_user) }
+
+      it 'User can not delete not his question' do
+         expect { delete :destroy, id: question }.to_not change(Question, :count)
+      end
+
+      it "redirects to index view and display alert message" do
+        delete :destroy, id: question
+        expect(response).to redirect_to questions_path
+        expect(flash[:alert]).to eq 'You have not rights to delete this question!'
+      end
     end
   end
 end

@@ -129,20 +129,33 @@ RSpec.describe AnswersController, type: :controller do
   describe "DELETE #destroy" do
     sign_in_user
 
-    let!(:answer) { create :answer }
+    context 'Author can delete his own answer' do
+      let!(:answer) { create(:answer, question: question, user: @user) }
 
-    it "assigns the requested answer to @answer" do
-      delete :destroy, id: answer
-      expect(assigns(:answer)).to eq(answer)
+      it 'deletes answer from database' do
+        expect { delete :destroy, question_id: question, id: answer }.to change(Answer, :count).by(-1)
+      end
+
+      it "redirects to question show view and display notice message" do
+        delete :destroy, question_id: question, id: answer
+        expect(response).to redirect_to question_path(question)
+        expect(flash[:notice]).to eq 'Your answer successfully deleted.'
+      end
     end
 
-    it "deletes answer" do
-      expect { delete :destroy, id: answer }.to change(Answer, :count).by(-1)
-    end
+    context 'Non author can not delete answer' do
+      let(:another_user) { create(:user) }
+      let!(:answer) { create(:answer, question: question, user: another_user) }
 
-    it "redirects to index view" do
-      delete :destroy, id: answer
-      expect(response).to redirect_to question_answers_path(answer.question)
+      it 'User can not delete not his answer' do
+        expect { delete :destroy, question_id: question, id: answer }.to_not change(Answer, :count)
+      end
+
+      it "redirects to question show view and display alert message" do
+        delete :destroy, question_id: question, id: answer
+        expect(response).to redirect_to question_path(question)
+        expect(flash[:alert]).to eq 'You have not rights to delete this answer!'
+      end
     end
   end
 

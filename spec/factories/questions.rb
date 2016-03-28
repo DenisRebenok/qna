@@ -1,10 +1,10 @@
 FactoryGirl.define do
   sequence :title do |n|
-    "My #{n} String"
+    "Question title #{n}"
   end
 
   sequence :body do |n|
-    "My #{n} Text"
+    "Question body text #{n}"
   end
 
   factory :question do
