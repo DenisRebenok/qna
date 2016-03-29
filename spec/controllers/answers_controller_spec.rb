@@ -65,9 +65,9 @@ RSpec.describe AnswersController, type: :controller do
         expect(assigns(:answer).user).to eq @user
       end
 
-      it "redirects to question" do
+      it "redirects to question show view" do
         post :create, qna_params
-        expect(response).to redirect_to question_path(assigns(:answer).question)
+        expect(response).to redirect_to question_path(question)
       end
     end
 
@@ -78,9 +78,9 @@ RSpec.describe AnswersController, type: :controller do
         expect { post :create, qna_params }.to_not change(Answer, :count)
       end
 
-      it "redirects to question" do
+      it "redirects to question show view" do
         post :create, qna_params
-        expect(response).to redirect_to question_path(assigns(:answer).question)
+        expect(response).to redirect_to question_path(question)
       end
     end
   end

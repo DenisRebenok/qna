@@ -14,8 +14,11 @@ feature 'User can write answer', %q{
 
     create_answer(question, 'stupid answer')
 
+    expect(current_path).to eq question_path(question)
     expect(page).to have_content 'Answer was successfully created.'
-    expect(page).to have_content 'stupid answer'
+    within '.answers' do
+      expect(page).to have_content 'stupid answer'
+    end
   end
 
   scenario 'Authenticated user creates answer with invalid attributes' do

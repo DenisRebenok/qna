@@ -1,6 +1,6 @@
 class AnswersController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :load_question, only: [:index, :new, :create]
+  before_action :load_question, only: [:index, :create]
   before_action :load_answer, only: [:show, :edit, :update, :destroy]
 
   def index
