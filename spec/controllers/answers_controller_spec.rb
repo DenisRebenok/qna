@@ -31,19 +31,8 @@ RSpec.describe AnswersController, type: :controller do
     end
   end
 
-  describe "GET #new" do
-    before { get :new, question_id: question }
-
-    it 'assigns a new Answer to @answer' do
-      expect(assigns :answer).to be_a_new(Answer)
-    end
-
-    it "renders new view" do
-      expect(response).to render_template :new
-    end
-  end
-
   describe "GET #edit" do
+    sign_in_user
     let(:answer) { create :answer }
     before { get :edit, id: answer }
 
@@ -57,8 +46,10 @@ RSpec.describe AnswersController, type: :controller do
   end
 
   describe "POST #create" do
+    sign_in_user
+
     context "with valid atributes" do
-      let(:qna_params) { {answer: attributes_for(:answer), question_id: question} }
+      let(:qna_params) { {answer: attributes_for(:answer), question_id: question } }
 
       it "assigns the requested answer to @answer" do
         post :create, qna_params
@@ -69,9 +60,14 @@ RSpec.describe AnswersController, type: :controller do
         expect { post :create, qna_params }.to change(question.answers, :count).by(1)
       end
 
-      it "redirects to answer show view" do
+      it 'created answer belongs to user who have created it' do
         post :create, qna_params
-        expect(response).to redirect_to answer_path(assigns(:answer))
+        expect(assigns(:answer).user).to eq @user
+      end
+
+      it "redirects to question" do
+        post :create, qna_params
+        expect(response).to redirect_to question_path(assigns(:answer).question)
       end
     end
 
@@ -82,14 +78,16 @@ RSpec.describe AnswersController, type: :controller do
         expect { post :create, qna_params }.to_not change(Answer, :count)
       end
 
-      it "re-renders new view" do
+      it "redirects to question" do
         post :create, qna_params
-        expect(response).to render_template :new
+        expect(response).to redirect_to question_path(assigns(:answer).question)
       end
     end
   end
 
   describe "PATCH #update" do
+    sign_in_user
+
     let(:answer) { create :answer }
 
     it "assigns the requested answer to @answer" do
@@ -119,7 +117,7 @@ RSpec.describe AnswersController, type: :controller do
       end
 
       it "does not change answer attributes" do
-        expect(answer.body).to eq 'MyText'
+        expect(answer.body).to_not eq nil
       end
 
       it "re-render edit view" do
@@ -129,21 +127,35 @@ RSpec.describe AnswersController, type: :controller do
   end
 
   describe "DELETE #destroy" do
-    let!(:answer) { create :answer }
+    sign_in_user
 
-    it "assigns the requested answer to @answer" do
-      delete :destroy, id: answer
-      expect(assigns(:answer)).to eq(answer)
+    context 'Author can delete his own answer' do
+      let!(:answer) { create(:answer, question: question, user: @user) }
+
+      it 'deletes answer from database' do
+        expect { delete :destroy, question_id: question, id: answer }.to change(Answer, :count).by(-1)
+      end
+
+      it "redirects to question show view and display notice message" do
+        delete :destroy, question_id: question, id: answer
+        expect(response).to redirect_to question_path(question)
+        expect(flash[:notice]).to eq 'Your answer successfully deleted.'
+      end
     end
 
+    context 'Non author can not delete answer' do
+      let(:another_user) { create(:user) }
+      let!(:answer) { create(:answer, question: question, user: another_user) }
 
-    it "deletes answer" do
-      expect { delete :destroy, id: answer }.to change(Answer, :count).by(-1)
-    end
+      it 'User can not delete not his answer' do
+        expect { delete :destroy, question_id: question, id: answer }.to_not change(Answer, :count)
+      end
 
-    it "redirects to index view" do
-      delete :destroy, id: answer
-      expect(response).to redirect_to question_answers_path(answer.question)
+      it "redirects to question show view and display alert message" do
+        delete :destroy, question_id: question, id: answer
+        expect(response).to redirect_to question_path(question)
+        expect(flash[:alert]).to eq 'You have not rights to delete this answer!'
+      end
     end
   end
 

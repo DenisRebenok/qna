@@ -1,4 +1,5 @@
 class AnswersController < ApplicationController
+  before_action :authenticate_user!, except: [:index, :show]
   before_action :load_question, only: [:index, :new, :create]
   before_action :load_answer, only: [:show, :edit, :update, :destroy]
 
@@ -9,20 +10,17 @@ class AnswersController < ApplicationController
   def show
   end
 
-  def new
-    @answer = @question.answers.new
-  end
+  # def new
+  #   @answer = @question.answers.new
+  # end
 
   def edit
   end
 
   def create
-    @answer = @question.answers.new(answers_params)
-    if @answer.save
-      redirect_to @answer
-    else
-      render :new
-    end
+    @answer = current_user.answers.new(answers_params.merge(question: @question))
+    msg = @answer.save ? 'Answer was successfully created.' : 'Error was happened when trying to save answer.'
+    redirect_to @question, notice: msg
   end
 
   def update
@@ -34,8 +32,13 @@ class AnswersController < ApplicationController
   end
 
   def destroy
-    @answer.destroy
-    redirect_to question_answers_path(@answer.question)
+    if current_user.author_of?(@answer)
+      @answer.destroy
+      flash[:notice] = 'Your answer successfully deleted.'
+    else
+      flash[:alert] = 'You have not rights to delete this answer!'
+    end
+    redirect_to @answer.question
   end
 
   private

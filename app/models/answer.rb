@@ -1,4 +1,5 @@
 class Answer < ActiveRecord::Base
   belongs_to :question
-  validates :question_id, :body, presence: true
+  belongs_to :user
+  validates :question_id, :user_id, :body, presence: true
 end

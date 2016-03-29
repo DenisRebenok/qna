@@ -30,6 +30,8 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'GET #new' do
+    sign_in_user
+
     before { get :new }
 
     it 'assigns a new Question to @question' do
@@ -42,6 +44,7 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'GET #edit' do
+    sign_in_user
     before { get :edit, id:question }
 
     it 'assigns the requested question to @question' do
@@ -54,9 +57,15 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'POST #create' do
+    sign_in_user
     context 'with valid attributes' do
       it 'saves the new question in the database' do
         expect { post :create, question: attributes_for(:question) }.to change(Question, :count).by(1)
+      end
+
+      it 'created question belongs to user who have created it' do
+        post :create, question: attributes_for(:question)
+        expect(assigns(:question).user).to eq @user
       end
 
       it 'redirects to show view' do
@@ -78,6 +87,7 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe "PATCH #update" do
+    sign_in_user
     context "valid attributes" do
       it "assigns the requested question to @question" do
         patch :update, id: question, question: attributes_for(:question)
@@ -102,8 +112,8 @@ RSpec.describe QuestionsController, type: :controller do
 
       it "does not change question attributes" do
         question.reload
-        expect(question.title).to eq 'MyString'
-        expect(question.body).to eq 'MyText'
+        expect(question.title).to_not eq 'new title'
+        expect(question.body).to_not eq nil
       end
 
       it "re-renders edit view" do
@@ -113,15 +123,35 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe "DELETE #destroy" do
-    before { question }
+    sign_in_user
 
-    it "deletes question" do
-      expect { delete :destroy, id: question }.to change(Question, :count).by(-1)
+    context 'Author can delete his own question' do
+      let!(:question) { create(:question, user: @user) }
+
+      it 'User deletes his own question' do
+        expect { delete :destroy, id: question }.to change(Question, :count).by(-1)
+      end
+
+      it "redirects to index view and display notice message" do
+        delete :destroy, id: question
+        expect(response).to redirect_to questions_path
+        expect(flash[:notice]).to eq 'Your question successfully deleted.'
+      end
     end
 
-    it "redirects to index view" do
-      delete :destroy, id: question
-      expect(response).to redirect_to questions_path
+    context 'Non author can not delete question' do
+      let(:another_user) { create(:user) }
+      let!(:question) { create(:question, user: another_user) }
+
+      it 'User can not delete not his question' do
+         expect { delete :destroy, id: question }.to_not change(Question, :count)
+      end
+
+      it "redirects to index view and display alert message" do
+        delete :destroy, id: question
+        expect(response).to redirect_to questions_path
+        expect(flash[:alert]).to eq 'You have not rights to delete this question!'
+      end
     end
   end
 end
