@@ -9,7 +9,7 @@ feature 'User can write answer', %q{
   given(:user) { create :user }
   given!(:question) { create :question }
 
-  scenario 'Authenticated user creates answer' do
+  scenario 'Authenticated user creates answer', js: true do
     sign_in(user)
 
     create_answer(question, 'stupid answer')
@@ -21,7 +21,7 @@ feature 'User can write answer', %q{
     end
   end
 
-  scenario 'Authenticated user creates answer with invalid attributes' do
+  scenario 'Authenticated user creates answer with invalid attributes', js: true do
     sign_in(user)
 
     create_answer(question, '')

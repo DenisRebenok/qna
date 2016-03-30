@@ -19,8 +19,13 @@ class AnswersController < ApplicationController
 
   def create
     @answer = current_user.answers.new(answers_params.merge(question: @question))
-    msg = @answer.save ? 'Answer was successfully created.' : 'Error was happened when trying to save answer.'
-    redirect_to @question, notice: msg
+    # msg = @answer.save ? 'Answer was successfully created.' : 'Error was happened when trying to save answer.'
+    # redirect_to @question, notice: msg
+    if @answer.save
+      flash[:notice] = 'Answer was successfully created.'
+    else
+      flash[:alert] = 'Error was happened when trying to save answer.'
+    end
   end
 
   def update

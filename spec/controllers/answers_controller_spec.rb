@@ -49,7 +49,7 @@ RSpec.describe AnswersController, type: :controller do
     sign_in_user
 
     context "with valid atributes" do
-      let(:qna_params) { {answer: attributes_for(:answer), question_id: question } }
+      let(:qna_params) { {answer: attributes_for(:answer), question_id: question, format: :js } }
 
       it "assigns the requested answer to @answer" do
         post :create, qna_params
@@ -65,22 +65,22 @@ RSpec.describe AnswersController, type: :controller do
         expect(assigns(:answer).user).to eq @user
       end
 
-      it "redirects to question show view" do
+      it "render create template" do
         post :create, qna_params
-        expect(response).to redirect_to question_path(question)
+        expect(response).to render_template :create
       end
     end
 
     context "with invalid attributes" do
-      let(:qna_params) { { answer: attributes_for(:invalid_answer), question_id: question } }
+      let(:qna_params) { { answer: attributes_for(:invalid_answer), question_id: question, format: :js } }
 
       it 'does not save the answer' do
         expect { post :create, qna_params }.to_not change(Answer, :count)
       end
 
-      it "redirects to question show view" do
+      it "render create template" do
         post :create, qna_params
-        expect(response).to redirect_to question_path(question)
+        expect(response).to render_template :create
       end
     end
   end
