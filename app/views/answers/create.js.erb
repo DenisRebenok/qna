@@ -1,9 +1,9 @@
 <%if @answer.errors.any? %>
-  $('.alert').html('<%= j flash[:alert] %>');
-  $('.notice').html('');
+  <% @answer.errors.full_messages.each do |message| %>
+      $('.answer-errors').html('<%= j message %>');
+<% end %>
 <%else%>
   $('.answers').append('<%=j render @answer %>');
   $('#answer_body').val('');
-  $('.notice').html('<%= j flash[:notice] %>');
-  $('.alert').html('');
+  $('.answer-errors').html('<%= j flash[:notice] %>');
 <%end%>
