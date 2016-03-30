@@ -9,16 +9,19 @@ feature 'User can write answer', %q{
   given(:user) { create :user }
   given!(:question) { create :question }
 
-  scenario 'Authenticated user creates answer' do
+  scenario 'Authenticated user creates answer', js: true do
     sign_in(user)
 
     create_answer(question, 'stupid answer')
 
+    expect(current_path).to eq question_path(question)
     expect(page).to have_content 'Answer was successfully created.'
-    expect(page).to have_content 'stupid answer'
+    within '.answers' do
+      expect(page).to have_content 'stupid answer'
+    end
   end
 
-  scenario 'Authenticated user creates answer with invalid attributes' do
+  scenario 'Authenticated user creates answer with invalid attributes', js: true do
     sign_in(user)
 
     create_answer(question, '')
