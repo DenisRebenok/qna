@@ -1,0 +1,8 @@
+<%if @answer.errors.any? %>
+  <% @answer.errors.full_messages.each do |message| %>
+    $('.answer-errors').html('<%= j message %>');
+  <% end %>
+<%else%>
+  $('#answer-<%= @answer.id %>').replaceWith('<%=j render @answer %>');
+  $('.answer-errors').html('<%= j flash[:notice] %>');
+<%end%>

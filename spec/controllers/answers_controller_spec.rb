@@ -1,59 +1,20 @@
 require 'rails_helper'
 
 RSpec.describe AnswersController, type: :controller do
-  let(:question) { create :question }
-
-
-  describe "GET #index" do
-    let(:answers) { create_list(:answer, 2, :question) }
-
-    before { get :index, question_id: question }
-
-    it "populates an array of all answers for question" do
-      expect(assigns(:answers)).to match_array question.answers
-    end
-
-    it "renders index view" do
-      expect(response).to render_template :index
-    end
-  end
-
-  describe "GET #show" do
-    let(:answer) { create :answer }
-    before { get :show, id: answer }
-
-    it "assigns the requested answer to @answer" do
-      expect(assigns :answer).to eq(answer)
-    end
-
-    it "renders show view" do
-      expect(response).to render_template :show
-    end
-  end
-
-  describe "GET #edit" do
-    sign_in_user
-    let(:answer) { create :answer }
-    before { get :edit, id: answer }
-
-    it "assigns the requested answer to @answer" do
-      expect(assigns :answer).to eq(answer)
-    end
-
-    it "renders edit view" do
-      expect(response).to render_template :edit
-    end
-  end
+  let(:user) { create :user }
+  let!(:question) { create :question }
+  let!(:answer) { create(:answer, question: question, user: user) }
+  let!(:foreign_answer) { create(:answer, question: question) }
 
   describe "POST #create" do
-    sign_in_user
+    before { sign_in(user) }
 
     context "with valid atributes" do
       let(:qna_params) { {answer: attributes_for(:answer), question_id: question, format: :js } }
 
       it "assigns the requested answer to @answer" do
         post :create, qna_params
-        expect(assigns :answer).to eq(question.answers.first)
+        expect(assigns :answer).to eq(question.answers.last)
       end
 
       it 'saves the new answer in the database' do
@@ -62,7 +23,7 @@ RSpec.describe AnswersController, type: :controller do
 
       it 'created answer belongs to user who have created it' do
         post :create, qna_params
-        expect(assigns(:answer).user).to eq @user
+        expect(assigns(:answer).user).to eq user
       end
 
       it "render create template" do
@@ -86,51 +47,51 @@ RSpec.describe AnswersController, type: :controller do
   end
 
   describe "PATCH #update" do
-    sign_in_user
+    context 'Authenticated user' do
+      before { sign_in(user) }
 
-    let(:answer) { create :answer }
+      it "assigns the requested answer to @answer" do
+        patch :update, id: answer, question_id: question, answer: attributes_for(:answer), format: :js
+        expect(assigns(:answer)).to eq answer
+      end
 
-    it "assigns the requested answer to @answer" do
-      patch :update, id: answer, answer: attributes_for(:answer)
-      expect(assigns(:answer)).to eq(answer)
-    end
-
-    context "valid attributes" do
-      before do
-        patch :update, id: answer, answer: { body: 'new body' }
-        answer.reload
+      it "assigns the question" do
+        patch :update, id: answer, question_id: question, answer: attributes_for(:answer), format: :js
+        expect(assigns(:question)).to eq question
       end
 
       it "changes answer attributes" do
+        patch :update, id: answer, question_id: question, answer: { body: 'new body' }, format: :js
+        answer.reload
         expect(answer.body).to eq 'new body'
       end
 
-      it "redirects to the updated answer" do
-        expect(response).to redirect_to :answer
+      it "does not change foreign answer attributes" do
+        patch :update, id: foreign_answer, answer: { body: 'new body' }, format: :js
+        foreign_answer.reload
+        expect(foreign_answer.body).to_not eq 'new body'
+      end
+
+      it "render update template" do
+        patch :update, id: answer, question_id: question, answer: attributes_for(:answer), format: :js
+        expect(response).to render_template :update
       end
     end
 
-    context "invalid attributes" do
-      before do
-        patch :update, id: answer,  answer: attributes_for(:invalid_answer)
+    context 'Non-authenticated user' do
+      it 'does not change answer attributes' do
+        patch :update, id: answer, question_id: question, answer: { body: 'new body' }, format: :js
         answer.reload
-      end
-
-      it "does not change answer attributes" do
-        expect(answer.body).to_not eq nil
-      end
-
-      it "re-render edit view" do
-        expect(response).to render_template :edit
+        expect(answer.body).to_not eq 'new body'
       end
     end
   end
 
   describe "DELETE #destroy" do
-    sign_in_user
+    before { sign_in(user) }
 
     context 'Author can delete his own answer' do
-      let!(:answer) { create(:answer, question: question, user: @user) }
+      let!(:answer) { create(:answer, question: question, user: user) }
 
       it 'deletes answer from database' do
         expect { delete :destroy, question_id: question, id: answer }.to change(Answer, :count).by(-1)
@@ -158,5 +119,4 @@ RSpec.describe AnswersController, type: :controller do
       end
     end
   end
-
 end
