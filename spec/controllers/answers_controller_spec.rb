@@ -90,32 +90,25 @@ RSpec.describe AnswersController, type: :controller do
   describe "DELETE #destroy" do
     before { sign_in(user) }
 
-    context 'Author can delete his own answer' do
-      let!(:answer) { create(:answer, question: question, user: user) }
-
+    context 'Author' do
       it 'deletes answer from database' do
-        expect { delete :destroy, question_id: question, id: answer }.to change(Answer, :count).by(-1)
+        expect { delete :destroy, id: answer, format: :js }.to change(Answer, :count).by(-1)
       end
 
-      it "redirects to question show view and display notice message" do
-        delete :destroy, question_id: question, id: answer
-        expect(response).to redirect_to question_path(question)
-        expect(flash[:notice]).to eq 'Your answer successfully deleted.'
+      it 'render destroy template' do
+        delete :destroy, id: answer, format: :js
+        expect(response).to render_template :destroy
       end
     end
 
-    context 'Non author can not delete answer' do
-      let(:another_user) { create(:user) }
-      let!(:answer) { create(:answer, question: question, user: another_user) }
-
-      it 'User can not delete not his answer' do
-        expect { delete :destroy, question_id: question, id: answer }.to_not change(Answer, :count)
+    context 'Non author' do
+      it "can't delete foreign answer" do
+        expect { delete :destroy, id: foreign_answer, format: :js }.to_not change(Answer, :count)
       end
 
-      it "redirects to question show view and display alert message" do
-        delete :destroy, question_id: question, id: answer
-        expect(response).to redirect_to question_path(question)
-        expect(flash[:alert]).to eq 'You have not rights to delete this answer!'
+      it 'render destroy template' do
+        delete :destroy, id: foreign_answer, format: :js
+        expect(response).to render_template :destroy
       end
     end
   end
