@@ -1,7 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe QuestionsController, type: :controller do
-  let(:question) { create(:question) }
+  let(:user) { create :user }
+  let(:question) { create(:question, user: user) }
+  let(:foreign_question) { create :question }
 
   describe 'GET #index' do
     let(:questions) { create_list(:question, 2) }
@@ -47,18 +49,20 @@ RSpec.describe QuestionsController, type: :controller do
     end
   end
 
-  describe 'GET #edit' do
-    sign_in_user
-    before { get :edit, id:question }
-
-    it 'assigns the requested question to @question' do
-      expect(assigns(:question)).to eq(question)
-    end
-
-    it 'renders edit view' do
-      expect(response).to render_template(:edit)
-    end
-  end
+  # describe 'GET #edit' do
+  #   sign_in_user
+  #
+  #   context ''
+  #   before { get :edit, id:question }
+  #
+  #   it 'assigns the requested question to @question' do
+  #     expect(assigns(:question)).to eq(question)
+  #   end
+  #
+  #   it 'renders edit view' do
+  #     expect(response).to render_template(:edit)
+  #   end
+  # end
 
   describe 'POST #create' do
     sign_in_user
@@ -91,37 +95,40 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe "PATCH #update" do
-    sign_in_user
-    context "valid attributes" do
+    context 'Authenticated user' do
+      before { sign_in(user) }
+
       it "assigns the requested question to @question" do
-        patch :update, id: question, question: attributes_for(:question)
-        expect(assigns(:question)).to eq(question)
+        patch :update, id: question, question: attributes_for(:question), format: :js
+        expect(assigns(:question)).to eq question
       end
 
-      it "changes question attributes" do
-        patch :update, id: question, question: { title: 'new title', body: 'new body' }
+      it 'change question attributes' do
+        patch :update, id: question, question: { title: 'new title', body: 'new body' }, format: :js
         question.reload
         expect(question.title).to eq 'new title'
         expect(question.body).to eq 'new body'
       end
 
-      it "redirects to the updated question" do
-        patch :update, id: question, question: attributes_for(:question)
-        expect(response).to redirect_to :question
+      it "does not change foreign question attributes" do
+        patch :update, id: foreign_question, question: { title: 'new title', body: 'new body' }, format: :js
+        foreign_question.reload
+        expect(foreign_question.title).to_not eq 'new title'
+        expect(foreign_question.body).to_not eq 'new body'
+      end
+
+      it "render update template" do
+        patch :update, id: question, question: attributes_for(:question), format: :js
+        expect(response).to render_template :update
       end
     end
 
-    context "invalid atributes" do
-      before { patch :update, id: question, question: { title: 'new title', body: nil } }
-
-      it "does not change question attributes" do
+    context 'Non-authenticated user' do
+      it 'does not change question attributes' do
+        patch :update, id: question, question: { title: 'new title', body: 'new body' }, format: :js
         question.reload
         expect(question.title).to_not eq 'new title'
-        expect(question.body).to_not eq nil
-      end
-
-      it "re-renders edit view" do
-        expect(response).to render_template :edit
+        expect(question.body).to_not eq 'new body'
       end
     end
   end
