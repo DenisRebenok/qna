@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe AnswersController, type: :controller do
   let(:user) { create :user }
-  let!(:question) { create :question }
+  let!(:question) { create :question, user: user }
   let!(:answer) { create(:answer, question: question, user: user) }
   let!(:foreign_answer) { create(:answer, question: question) }
 
@@ -109,6 +109,40 @@ RSpec.describe AnswersController, type: :controller do
       it 'render destroy template' do
         delete :destroy, id: foreign_answer, format: :js
         expect(response).to render_template :destroy
+      end
+    end
+  end
+
+  describe 'PATCH #best' do
+    let(:foreign_question) { create(:question) }
+    let(:other_answer) { create(:answer, question: foreign_question) }
+
+    context 'Authenticated user' do
+      before { sign_in(user) }
+
+      it 'set best answer' do
+        patch :best, id: answer, format: :js
+        answer.reload
+        expect(answer.best).to eq true
+      end
+
+      it 'render best template' do
+        patch :best, id: answer, format: :js
+        expect(response).to render_template :best
+      end
+
+      it "doesn't set best answer for foreign question" do
+        patch :best, id: other_answer, format: :js
+        other_answer.reload
+        expect(other_answer.best).to eq false
+      end
+    end
+
+    context 'Unauthenticated user' do
+      it "doesn't set best answer for foreign question" do
+        patch :best, id: answer, format: :js
+        answer.reload
+        expect(answer.best).to eq false
       end
     end
   end

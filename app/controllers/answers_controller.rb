@@ -1,11 +1,7 @@
 class AnswersController < ApplicationController
   before_action :authenticate_user!
   before_action :load_question, only: [:create]
-  before_action :load_answer, only: [:update, :destroy]
-
-  # def index
-  #   @answers = @question.answers
-  # end
+  before_action :load_answer, except: [:create]
 
   def create
     @answer = current_user.answers.new(answers_params.merge(question: @question))
@@ -19,6 +15,11 @@ class AnswersController < ApplicationController
 
   def destroy
     @answer.destroy if current_user.author_of?(@answer)
+  end
+
+  def best
+    @answer.best! if current_user.author_of?(@answer.question)
+    @answers = @answer.question.answers
   end
 
   private
