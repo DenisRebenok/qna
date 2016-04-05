@@ -15,14 +15,6 @@ feature 'Setting best answer', %q{
   describe 'Authenticated user' do
     before { sign_in(user) }
 
-    scenario 'sees link for setting best answer' do
-      visit question_path(question)
-
-      within "#answer-#{answer.id}" do
-        expect(page).to have_link 'Best'
-      end
-    end
-
     scenario 'sets best answer for his question', js: true do
       visit question_path(question)
 

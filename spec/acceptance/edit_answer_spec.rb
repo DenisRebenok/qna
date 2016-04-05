@@ -14,14 +14,6 @@ feature 'Answer editing', %q{
   describe "Authenticated user" do
     before { sign_in user }
 
-    scenario 'sees link to Edit' do
-      visit question_path(question)
-
-      within '.answers' do
-        expect(page).to have_link 'Edit'
-      end
-    end
-
     scenario 'try to edit his answer', js: true do
       visit question_path(question)
 

@@ -13,12 +13,6 @@ feature 'Question editing', %q{
   describe "Authenticated user" do
     before { sign_in(user) }
 
-    scenario 'sees link to Edit' do
-      visit question_path(question)
-
-      expect(page).to have_link 'Edit'
-    end
-
     scenario 'try to edit his question', js: true do
       visit question_path(question)
 

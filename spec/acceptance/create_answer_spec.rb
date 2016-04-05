@@ -31,9 +31,8 @@ feature 'User can write answer', %q{
   end
 
   scenario 'Non-authenticated user tries to create answer' do
-    create_answer(question, '')
+    visit question_path(question)
 
-    expect(current_path).to eq new_user_session_path
-    expect(page).to have_content 'You need to sign in or sign up before continuing.'
+    expect(page).to_not have_selector 'textarea'
   end
 end

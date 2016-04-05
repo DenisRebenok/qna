@@ -17,12 +17,6 @@ feature 'Only author can delete his answer', %q{
       visit question_path(question)
     end
 
-    scenario 'sees link to Delete answer' do
-      within "#answer-#{answer.id}" do
-        expect(page).to have_link 'Delete answer'
-      end
-    end
-
     scenario 'deletes his answer', js: true do
       within "#answer-#{answer.id}" do
         click_on 'Delete answer'
