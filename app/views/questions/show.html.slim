@@ -1,13 +1,11 @@
-h1.title= @question.title
-p.body= @question.body
-- if user_signed_in? && current_user.author_of?(@question)
-  br= link_to 'Delete', @question, method: :delete, data: { confirm: 'Are you sure?' }
-br
+= render @question
 
 .answers
   = render @question.answers
-br
-p= form_for [@question, @answer], remote: true do |f|
-  = f.label :body
-  = f.text_area :body
-  = f.submit 'Post'
+
+- if user_signed_in?
+  p= form_for [@question, @answer], remote: true do |f|
+    = f.label :body
+    .answer-errors
+    = f.text_area :body
+    = f.submit 'Post'

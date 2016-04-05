@@ -1,0 +1,8 @@
+<%if @question.errors.any? %>
+  <% @question.errors.full_messages.each do |message| %>
+    $('p.alert').append('<%= j message %>');
+  <% end %>
+<%else%>
+  $('#question-<%= @question.id %>').html('<%=j render @question %>');
+  $('.notice').html('<%= j flash[:notice] %>');
+<%end%>

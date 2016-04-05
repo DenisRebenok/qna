@@ -1,4 +1,4 @@
-require 'rails_helper'
+require_relative 'acceptance_helper'
 
 feature 'User can write answer', %q{
   In order to be able to write answer to question
@@ -27,13 +27,12 @@ feature 'User can write answer', %q{
     create_answer(question, '')
 
     expect(current_path).to eq question_path(question)
-    expect(page).to have_content 'Error was happened when trying to save answer.'
+    expect(page).to have_content "Body can't be blank"
   end
 
   scenario 'Non-authenticated user tries to create answer' do
-    create_answer(question, '')
+    visit question_path(question)
 
-    expect(current_path).to eq new_user_session_path
-    expect(page).to have_content 'You need to sign in or sign up before continuing.'
+    expect(page).to_not have_selector 'textarea'
   end
 end

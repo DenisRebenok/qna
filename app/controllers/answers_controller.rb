@@ -1,49 +1,25 @@
 class AnswersController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
-  before_action :load_question, only: [:index, :create]
-  before_action :load_answer, only: [:show, :edit, :update, :destroy]
-
-  def index
-    @answers = @question.answers
-  end
-
-  def show
-  end
-
-  # def new
-  #   @answer = @question.answers.new
-  # end
-
-  def edit
-  end
+  before_action :authenticate_user!
+  before_action :load_question, only: [:create]
+  before_action :load_answer, except: [:create]
 
   def create
     @answer = current_user.answers.new(answers_params.merge(question: @question))
-    # msg = @answer.save ? 'Answer was successfully created.' : 'Error was happened when trying to save answer.'
-    # redirect_to @question, notice: msg
-    if @answer.save
-      flash[:notice] = 'Answer was successfully created.'
-    else
-      flash[:alert] = 'Error was happened when trying to save answer.'
-    end
+    flash[:notice] = 'Answer was successfully created.' if @answer.save
   end
 
   def update
-    if @answer.update(answers_params)
-      redirect_to @answer
-    else
-      render :edit
-    end
+    @answer.update(answers_params) if current_user.author_of?(@answer)
+    @question = @answer.question
   end
 
   def destroy
-    if current_user.author_of?(@answer)
-      @answer.destroy
-      flash[:notice] = 'Your answer successfully deleted.'
-    else
-      flash[:alert] = 'You have not rights to delete this answer!'
-    end
-    redirect_to @answer.question
+    @answer.destroy if current_user.author_of?(@answer)
+  end
+
+  def best
+    @answer.best! if current_user.author_of?(@answer.question)
+    @answers = @answer.question.answers
   end
 
   private
