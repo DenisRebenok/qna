@@ -2,6 +2,10 @@
   .question id = 'question-#{question.id}'
     .question-title= link_to question.title, question
     .question-content= question.body
+    p Attachments:
+    ul
+      - @question.attachments.each do |a|
+        li= a.file.file.filename
     - if user_signed_in? && current_user.author_of?(question)
       p= link_to 'Edit', '#', class: 'edit-question-link', data: { question_id: question.id }
       p
