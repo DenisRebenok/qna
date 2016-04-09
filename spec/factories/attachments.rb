@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :attachnent do
+  factory :attachment do
     file "MyString"
   end
 end
