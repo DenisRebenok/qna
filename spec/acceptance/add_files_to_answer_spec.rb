@@ -1,4 +1,4 @@
-require 'rails_helper'
+require_relative 'acceptance_helper'
 
 feature 'Add files to answer', %q{
   In order to illustrate my answer
@@ -14,14 +14,14 @@ feature 'Add files to answer', %q{
     visit question_path(question)
   end
 
-  scenario 'User adds file when create answer' do
-    fill_in 'Body', with: 'answer text'
+  scenario 'User adds file when create answer', js: :true do
+    fill_in 'Your answer', with: 'answer text'
     attach_file 'File', "#{Rails.root}/spec/spec_helper.rb"
 
     click_on 'Post'
-      expect(page).to have_link 'spec_helper.rb', href: '/uploads/attachment/file/1/spec_helper.rb'
-    within '.answers' do
 
+    within '.answers' do
+      expect(page).to have_link 'spec_helper.rb', href: '/uploads/attachment/file/1/spec_helper.rb'
     end
   end
 end
