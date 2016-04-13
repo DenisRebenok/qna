@@ -1,0 +1,13 @@
+p
+  = form_for answer, remote: true, html: { id: "edit-answer-#{answer.id}" } do |f|
+    .field
+      = f.label :body, "Answer"
+      br
+      = f.text_area :body
+    = f.fields_for :attachments do |a|
+      .nested-fields
+        = a.label :file
+        = a.file_field :file
+        = link_to_remove_association "remove file", a
+
+    = f.submit 'Save'
