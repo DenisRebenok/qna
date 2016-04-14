@@ -4,8 +4,14 @@
   = render @question.answers
 
 - if user_signed_in?
-  p= form_for [@question, @answer], remote: true do |f|
-    = f.label :body
-    .answer-errors
-    = f.text_area :body
-    = f.submit 'Post'
+  = form_for [@question, @answer], remote: true do |f|
+    p
+      = f.label :body, 'Your answer'
+      .answer-errors
+      = f.text_area :body
+    p
+      = f.fields_for :attachments do |a|
+        = render 'questions/attachment_fields', f: a
+      .links
+        = link_to_add_association 'add file', f, :attachments
+    p= f.submit 'Post'

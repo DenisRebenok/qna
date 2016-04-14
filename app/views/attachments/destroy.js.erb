@@ -1,0 +1,4 @@
+var attachment = $('li#attachment-' + '<%= @attachment.id %>');
+attachment.fadeOut("normal", function() {
+  $(this).remove();
+});
