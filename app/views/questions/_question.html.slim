@@ -13,9 +13,8 @@
           p
             = f.label :body, "Body"
             = f.text_area :body
-          p
-            = f.fields_for :attachments do |a|
-              = render 'questions/attachment_fields', f: a
-          /p= link_to_add_association 'add file', f, :attachments
+          /p
+          /  = f.fields_for :attachments do |a|
+          /    = render 'questions/attachment_fields', f: a
           p= f.submit 'Save'
       p= link_to 'Delete', question, method: :delete, data: { confirm: 'Are you sure?' }

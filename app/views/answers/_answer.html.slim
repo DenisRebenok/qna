@@ -9,9 +9,9 @@
           p
             = f.label :body, "Answer"
             = f.text_area :body
-          p
-            = f.fields_for :attachments do |a|
-              = render 'questions/attachment_fields', f: a
+          /p
+          /  = f.fields_for :attachments do |a|
+          /    = render 'questions/attachment_fields', f: a
           p= f.submit 'Save'
       p= link_to 'Delete answer', answer, method: :delete, remote: true, data: { confirm: 'Are you sure?' }
     - if answer.best?
