@@ -14,3 +14,7 @@
 /public/uploads
 
 config/database.yml
+/.rspec
+.idea
+log
+config/secrets.yml

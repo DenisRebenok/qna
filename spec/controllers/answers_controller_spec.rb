@@ -14,7 +14,7 @@ RSpec.describe AnswersController, type: :controller do
 
       it "assigns the requested answer to @answer" do
         post :create, qna_params
-        expect(assigns :answer).to eq(question.answers.last)
+        expect(assigns :answer).to eq(question.answers.first)
       end
 
       it 'saves the new answer in the database' do
