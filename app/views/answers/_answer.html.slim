@@ -1,5 +1,7 @@
 - if answer.persisted?
   div class = "answer #{answer.best? ? 'best-answer':''}" id = 'answer-#{answer.id}'
+    =render 'shared/vote_controls', object: answer
+
     .answer-content= answer.body
     = render 'attachments/attachments', resource: answer
     - if user_signed_in? && current_user.author_of?(answer)

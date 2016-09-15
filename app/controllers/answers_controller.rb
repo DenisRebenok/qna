@@ -1,4 +1,6 @@
 class AnswersController < ApplicationController
+  include Voting
+
   before_action :authenticate_user!
   before_action :load_question, only: [:create]
   before_action :load_answer, except: [:create]

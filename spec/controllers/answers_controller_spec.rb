@@ -6,6 +6,8 @@ RSpec.describe AnswersController, type: :controller do
   let!(:answer) { create(:answer, question: question, user: user) }
   let!(:foreign_answer) { create(:answer, question: question) }
 
+  it_behaves_like 'voting'
+
   describe "POST #create" do
     before { sign_in(user) }
 
