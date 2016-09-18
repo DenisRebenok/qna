@@ -22,7 +22,7 @@ feature 'deleting questions file', %q{
       within "#question-#{question.id}" do
         expect(page).to have_link 'spec_helper.rb', href: '/uploads/attachment/file/3/spec_helper.rb'
         click_on 'Edit'
-        click_on 'remove file'
+        click_on 'Remove file'
         click_on 'Save'
         expect(page).to_not have_link 'spec_helper.rb', href: '/uploads/attachment/file/3/spec_helper.rb'
       end

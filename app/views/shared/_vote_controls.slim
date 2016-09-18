@@ -1,0 +1,6 @@
+.vote-control data={ object_id: object.id }
+  .object-vote-result= object.votes_rating
+  - if current_user && !current_user.author_of?(object)
+    = link_to 'revoke vote', send("unvote_#{object.class.name.downcase}_path".to_sym, object), class: "revoke-vote vote-control-link #{hidden_class_if_not_voted(current_user, object)}", method: :delete, remote: true
+    = link_to 'vote up', send("vote_up_#{object.class.name.downcase}_path".to_sym, object), class: "vote-up vote-control-link #{hidden_class_if_voted(current_user, object)}", method: :patch, remote: true
+    = link_to 'vote down', send("vote_down_#{object.class.name.downcase}_path".to_sym, object), class: "vote-down vote-control-link #{hidden_class_if_voted(current_user, object)}", method: :patch, remote: true

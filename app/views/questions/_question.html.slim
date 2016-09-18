@@ -1,6 +1,7 @@
 - if question.persisted?
   .question id = 'question-#{question.id}'
     .question-title= link_to question.title, question
+    = render 'shared/vote_controls', object: question
     .question-content= question.body
     = render 'attachments/attachments', resource: question
     - if user_signed_in? && current_user.author_of?(question)

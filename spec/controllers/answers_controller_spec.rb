@@ -6,6 +6,8 @@ RSpec.describe AnswersController, type: :controller do
   let!(:answer) { create(:answer, question: question, user: user) }
   let!(:foreign_answer) { create(:answer, question: question) }
 
+  it_behaves_like 'voting'
+
   describe "POST #create" do
     before { sign_in(user) }
 
@@ -14,7 +16,7 @@ RSpec.describe AnswersController, type: :controller do
 
       it "assigns the requested answer to @answer" do
         post :create, qna_params
-        expect(assigns :answer).to eq(question.answers.last)
+        expect(assigns :answer).to eq(question.answers.first)
       end
 
       it 'saves the new answer in the database' do

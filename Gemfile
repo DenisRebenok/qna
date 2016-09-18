@@ -49,6 +49,7 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem 'database_cleaner'
   gem 'capybara-webkit'
+  gem 'json_spec'
 end
 
 group :test do
